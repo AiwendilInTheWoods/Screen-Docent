@@ -72,7 +72,7 @@ The frontend must provide the user with specific rendering configurations to han
 **2. Configuration & State Persistence:**
 - **Hierarchical Configuration:** A robust override system where URL parameters supersede Playlist-level defaults, which in turn supersede Global system defaults. All time-based settings (cycle times, placard timers) are handled in seconds for user clarity.
 - **State Persistence & Migrations:** Implementation of safe SQLite schema updates. On startup, the system automatically detects and adds missing columns to existing databases.
-- **Docker Persistence:** Official `docker-compose` support with named volume mapping for both the `artwork.db` and the library media directory to prevent data loss during updates.
+- **Docker Persistence:** Official `docker-compose` support with robust directory mapping for both the `/app/data` (database) and the `/app/Artwork` (media) directories to prevent data loss.
 
 **3. Enhanced AI Curation:**
 - **Context-Aware Analysis:** The AI Curator Agent now uses original filenames (cleaned of underscores/dashes) as contextual hints for identification.
