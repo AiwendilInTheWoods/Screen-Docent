@@ -54,22 +54,23 @@ Phase 6 introduces an autonomous curation intelligence that observes how artwork
 
 ---
 
+## Recently Completed: Aggressive Cache-Busting for UI (2026-04-29)
+
+Resolved a persistent issue where thumbnails in the UI showed incorrect images after a factory reset.
+- Added explicit cache-busters (`?f=filename.jpg`) to all Review Queue thumbnail requests.
+- Updated `app.py` middleware to explicitly return `no-cache` for HTML files so users never get stuck on cached JS.
+
+---
+
 ## Next Immediate Steps
 
 > [!IMPORTANT]
-> Before building any Director agent logic, the database schema must be extended safely.
+> The Phase 6 Database expansion, Bag Shuffle statefulness, and Frontend Telemetry wiring are fully complete.
 
-### Step 1: Expand Museum Collections
-Add more Tier-2 museum sources (Harvard Art Museums, Smithsonian) to broaden the discovery pool. Each requires API key management via the admin Settings panel.
-
-### Step 2: Implement Alembic Database Migrations
-Replace the hand-rolled `apply_migrations()` in `database.py` with Alembic for proper schema evolution tracking.
-
-### Step 3: Add Telemetry Columns
-Using Alembic, add `affinity_score`, `skip_count`, and `total_display_time` to the artworks table.
-
-### Step 4: Build the Telemetry Ingestion Endpoint
-Create `POST /api/telemetry/heartbeat` for the Canvas client to report display durations.
+### Step 1: Director Agent Optimization
+The foundational telemetry loop is active. The backend is receiving `total_display_time`, `skip_count`, and updating the `affinity_score`. 
+The `affinity_score` is already actively weighting the "Bag Shuffle" probabilities for playlist selection. 
+We need to monitor and potentially refine the (V1) math in the heartbeat endpoint to ensure affinity doesn't scale unbounded or penalize items unfairly.
 
 ---
 
