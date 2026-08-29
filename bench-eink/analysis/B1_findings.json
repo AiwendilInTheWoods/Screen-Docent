@@ -1,0 +1,597 @@
+{
+ "_meta": {
+  "agent": "B1_tone_structure",
+  "date": "2026-08-29",
+  "corpus_commit": "1063f81",
+  "source": "bench-eink/analysis/A1_rederived.jsonl (48 tonefine, 4 edges, 4 linepairs, 2 resample, 2 surround)",
+  "error_bars": "bench-eink/analysis/error_bars.json (A1) - adopted, independently reproduced to <5%",
+  "units": "camera-RGB normalised to THIS panel's own black=0 / white=255 - NOT sRGB",
+  "report": "bench-eink/analysis/B1_tone_structure.md",
+  "artifacts": [
+   "B1_tonefine_metrics.json",
+   "B1_tonefine_clean.json",
+   "B1_tonefine_prior_aligned.jsonl",
+   "B1_transfer_function.json"
+  ],
+  "rule": "nothing below its 95% MDD is reported as a finding"
+ },
+ "corrections_to_the_data": [
+  {
+   "id": "B1-C1",
+   "what": "wp=0 means the white-point lever is OFF (eink_bench applies it only when wp>0), so wp0 and wp1.0 are BIT-IDENTICAL renders",
+   "evidence": "null check across 6 metrics, every difference inside its bar (max: max_chroma -8.32 vs MDD 10.6)",
+   "consequence": "the white-point axis is four levels (1.0/0.88/0.75/0.64), and pooling wp0 with wp1.0 is what gives the uncompressed corner any replication"
+  },
+  {
+   "id": "B1-C2",
+   "severity": "instrument defect #9",
+   "what": "tonefine steps 11, 12, 24, 25 (the last two columns of each grid row) sample the white surround, not the patch",
+   "evidence": [
+    "mean out_lum by step: 90.4 (10) -> 212.6 (11) -> 235.9 (12) -> 123.0 (13); a monotone ramp cannot do that",
+    "deviation from a 5-step rolling median 91 and 101 at steps 11,12 vs 0-16 elsewhere",
+    "out_lum>240 in 23/48, 33/48, 36/48, 30/48 of rows",
+    "correlates with align dx at r=-0.55 (step 12) and -0.66 (step 25)"
+   ],
+   "invalidates": {
+    "ramp_span": "47 of 48 rows take their max from a contaminated step - UNUSABLE",
+    "grain_peak": "~50% of rows take their peak from a contaminated step - do not report",
+    "collapsed_step_pairs": "inflated, and inflated most in the brightest conditions"
+   },
+   "fix": "drop steps 11,12,24,25; use the two contiguous runs 0-10 and 13-23. Halves sigma on mean grain (2.29->1.42) and monotone pairs (1.72->1.31)"
+  },
+  {
+   "id": "B1-C3",
+   "severity": "instrument defect #10",
+   "what": "readout_edges 'asymmetry' is a CONTRAST readout, not a diffusion readout",
+   "evidence": "on the perfectly registered DIGITAL render, asymmetry = rendered(fg) - rendered(bg) exactly, for all 8 blocks (+220.1=255.0-34.9, -189.0=66.0-255.0, ...), alternating sign with the target's own i%2 polarity flip",
+   "consequence": "worst_asymmetry is the target's largest designed contrast, not a smear. edges cannot answer its question."
+  },
+  {
+   "id": "B1-C4",
+   "what": "a +26/255 grid-ROW term contaminates every level read from the tonefine grid",
+   "evidence": "within fixed digital-level bins, row1-row0 = +26.0, +31.9, +28.4, +26.7, +13.8 across five bins with n=100-200 each",
+   "unresolved": "row and level are perfectly confounded inside any one condition; cannot separate gradient / surround / condition"
+  }
+ ],
+ "error_bars_reproduced": {
+  "_note": "pooled within (wp_eff,gamma) identical-render groups, n>=3, 32 df; A1 value in brackets",
+  "collapsed_step_pairs": {
+   "sigma": 1.33,
+   "a1": 1.37
+  },
+  "grain_peak": {
+   "sigma": 10.4,
+   "a1": 10.74
+  },
+  "mean_grain": {
+   "sigma": 2.29,
+   "a1": 2.32
+  },
+  "mean_out_lum": {
+   "sigma": 4.08,
+   "a1": 4.09
+  },
+  "ramp_span": {
+   "sigma": 5.83,
+   "a1": 5.91
+  },
+  "monotone_pairs": {
+   "sigma": 1.72,
+   "a1": 1.75
+  },
+  "max_chroma": {
+   "sigma": 3.92,
+   "a1": 3.78
+  }
+ },
+ "error_bars_new_clean_metrics": {
+  "_basis": "clean 22 steps, two contiguous runs, 32 df",
+  "coll_lo_of10": {
+   "sigma": 0.91,
+   "mdd95": 2.54
+  },
+  "coll_hi_of10": {
+   "sigma": 0.86,
+   "mdd95": 2.41
+  },
+  "coll_excess": {
+   "sigma": 1.22,
+   "mdd95": 3.41
+  },
+  "grain_hi": {
+   "sigma": 1.11,
+   "mdd95": 3.1
+  },
+  "grain_lo": {
+   "sigma": 2.64,
+   "mdd95": 7.41
+  },
+  "med_step": {
+   "sigma": 1.62,
+   "mdd95": 4.52
+  },
+  "c_mean_grain": {
+   "sigma": 1.42,
+   "mdd95": 3.98
+  },
+  "c_grain_peak": {
+   "sigma": 8.43,
+   "mdd95": 23.6
+  }
+ },
+ "findings": [
+  {
+   "id": "B1-F1",
+   "claim": "Collapse is TWO opposite phenomena; the shipped metric adds them and cancels the main effects",
+   "numbers": {
+    "coll_hi_over_wp_range": 1.42,
+    "coll_lo_over_wp_range": -1.64,
+    "coll_hi_over_gamma_range": -2.75,
+    "coll_lo_over_gamma_range": 1.73
+   },
+   "p_perm_block2": {
+    "coll_hi_wp": 0.0048,
+    "coll_hi_gamma": 0.0002,
+    "coll_lo_wp": 0.0145,
+    "coll_lo_gamma": 0.0017
+   },
+   "clears_bar": true,
+   "confirmed_on_randomised_block2": true
+  },
+  {
+   "id": "B1-F2",
+   "claim": "The wp x gamma INTERACTION on highlight collapse is the largest structured effect in the tone data: white-point only buys anything at low gamma",
+   "numbers": {
+    "interaction_over_range_all48": -7.55,
+    "interaction_over_range_block2": -8.61,
+    "mdd95": 2.41,
+    "coll_hi_at_gamma1.0_by_wp": {
+     "1.0": 5.0,
+     "0.88": 3.8,
+     "0.75": 0.4,
+     "0.64": 1.4
+    },
+    "coll_hi_at_gamma1.8_by_wp": {
+     "1.0": 0.0,
+     "0.88": 0.0,
+     "0.75": 0.0,
+     "0.64": 0.8
+    }
+   },
+   "p_perm": {
+    "all48": 0.0002,
+    "block2": 0.0002
+   },
+   "clears_bar": true,
+   "confirmed_on_randomised_block2": true
+  },
+  {
+   "id": "B1-F3",
+   "claim": "Grain climbs with gamma and with compression - but grain_peak shows NOTHING; the honest carrier is grain_hi",
+   "numbers": {
+    "grain_hi_over_gamma_range": 18.48,
+    "grain_hi_over_wp_range": -13.52,
+    "mdd95": 3.1,
+    "grain_peak_over_gamma_range": 17.14,
+    "grain_peak_mdd95": 23.6,
+    "grain_peak_p_block2": 0.199
+   },
+   "clears_bar": true,
+   "confirmed_on_randomised_block2": true,
+   "overturns": "the brief's preliminary read 'grain_peak 30 -> 63 -> 98' - that is one un-randomised row of a contaminated metric"
+  },
+  {
+   "id": "B1-F4",
+   "claim": "GRAIN IS A FUNCTION OF WHERE THE TONE LANDS, NOT OF WHICH LEVER PUT IT THERE. Peak at digital ~55, decaying to ~2 at the white ink (163)",
+   "numbers": {
+    "R2_position_only": 0.824,
+    "R2_wp_gamma_interaction_model": 0.628,
+    "R2_position_plus_levers": 0.877,
+    "grain_by_digital_bin": {
+     "20-39": 32.5,
+     "40-59": 43.9,
+     "60-79": 40.5,
+     "80-99": 30.8,
+     "100-119": 18.4,
+     "120-139": 12.7,
+     "140-159": 5.2,
+     "160-179": 2.2
+    }
+   },
+   "consequence": "grain is NOT monotone in compression - content already below digital 55 gets CLEANER when compressed harder"
+  },
+  {
+   "id": "B1-F5",
+   "headline": true,
+   "claim": "THE WHITE-POINT KNEE IS AT 0.75, BRACKETED ON BOTH SIDES BY MEASUREMENTS THAT CLEAR THE BARS",
+   "numbers": {
+    "gamma": 1.0,
+    "wp0.88_to_0.75": {
+     "coll_hi": -3.4,
+     "bar": 1.52,
+     "verdict": "CLEARS - 0.88 leaves real highlight collapse"
+    },
+    "wp0.75_to_0.64": {
+     "coll_hi": 1.0,
+     "coll_lo": -1.0,
+     "coll_excess": 2.0,
+     "med_step": 1.44,
+     "monotone": -0.6,
+     "all_detail_metrics_inside_bar": true,
+     "grain_hi": 5.7,
+     "grain_hi_bar": 1.96,
+     "verdict": "grain only, no detail return"
+    },
+    "trade_rate_grain_hi_per_collapsed_pair": {
+     "wp_off_to_0.75": 2.02,
+     "wp0.88_to_0.75": 2.19,
+     "under_better_alignment": 1.73,
+     "honest_range": [
+      1.7,
+      2.2
+     ]
+    }
+   },
+   "robustness": "re-derived all 48 tonefine rows with alignment forced to (0.98,+72,-28): knee unchanged, every detail metric still tied between 0.75 and 0.64, all three grain metrics still clear",
+   "independently_confirms": "ADR-093 (ship a single white-point of ~0.75) from a different measurement sharing no data"
+  },
+  {
+   "id": "B1-F6",
+   "claim": "(wp 0.75, gamma 1.0) Pareto-dominates every other cell tested",
+   "numbers": {
+    "vs_wp0.88_g1.4": {
+     "coll_hi": "tie",
+     "grain_hi": -2.81,
+     "mean_lum": 23.08
+    },
+    "vs_wp0.64_g1.4": {
+     "coll_hi": "tie",
+     "grain_hi": -12.42,
+     "mean_lum": 86.61
+    },
+    "vs_wp0.75_g1.4": {
+     "coll_hi": "tie",
+     "grain_hi": -12.64,
+     "mean_lum": 57.32
+    },
+    "vs_wp_off_g1.8": {
+     "coll_hi": "tie",
+     "grain_hi": "tie",
+     "mean_lum": 28.07
+    }
+   },
+   "consequence": "once white-point is at 0.75, gamma above 1.0 is a pure cost on the neutral ramp: no measurable highlight recovery (0.40->0.82, bar 1.30), +12.6 highlight grain, -57 luminance",
+   "scope": "neutral ramp only - says nothing about colour"
+  },
+  {
+   "id": "B1-F7",
+   "claim": "Gamma buys the same detail in a worse currency and does not finish the job",
+   "numbers": {
+    "wp_to_0.75": {
+     "coll_hi_recovered": 4.6,
+     "grain_hi": 9.28,
+     "grain_lo": 16.87,
+     "lum": -56.7
+    },
+    "gamma_to_1.4": {
+     "coll_hi_recovered": 3.0,
+     "grain_hi": 3.47,
+     "grain_hi_below_bar": true,
+     "grain_lo": 18.46,
+     "lum": -47.4
+    },
+    "residual_highlight_collapse": {
+     "gamma1.4_coll_excess": 1.33,
+     "wp0.75_coll_excess": -1.8,
+     "gap": 3.13,
+     "bar": 2.49
+    }
+   },
+   "confirms": "ADR-090 (gamma preserves endpoints so the top still clips) - now with an error bar"
+  },
+  {
+   "id": "B1-F8",
+   "claim": "Chroma-gamma and saturation are exact no-ops on a neutral ramp, over the FULL lever range",
+   "numbers": {
+    "digital": {
+     "combinations_tested": 190,
+     "worst_max_pixel_difference": 0,
+     "capability_check_gamma_1.0_vs_1.4": {
+      "max_diff": 255,
+      "pct_pixels": 52.3
+     }
+    },
+    "on_glass_over_k_range": {
+     "coll_hi": 0.64,
+     "grain_hi": 1.12,
+     "mean_grain": 0.73,
+     "max_chroma": -5.27
+    },
+    "on_glass_over_s_range": {
+     "coll_hi": 0.49,
+     "grain_hi": -0.74,
+     "mean_grain": -0.72,
+     "max_chroma": 2.47
+    },
+    "all_inside_their_MDD": true
+   },
+   "method_warning": "the null MUST be evaluated on the quantised output of a pre-fed generator. Applying the lever chain to the ALREADY-DITHERED target reports saturation 0.7 changing 41% of grid-band pixels by up to 68/255 - an artefact of the test",
+   "consequence": "this is what licenses A1's identical-render replicate groups, hence every error bar in the corpus"
+  },
+  {
+   "id": "B1-F9",
+   "claim": "Work 16 (Flaming June) is a REAL anomaly - a registered prediction FAILED",
+   "prediction": "if the grain ridge explains it, work 16 must be dark with little above the ceiling; ADR-092 predicts the opposite (bright)",
+   "outcome": {
+    "mean_lum": 90.5,
+    "round4_median": 112.1,
+    "darker_than_median": true,
+    "but": "3rd darkest of 12; the two DARKER works both picked 0.88",
+    "wash_pct": 0.19,
+    "adr092_rule_predicts": "0.88 (light)",
+    "judge_picked": 0.64,
+    "adr092_wrong_here": true,
+    "grain_ridge_model_predicts": {
+     "wp0.64": 36.6,
+     "wp0.76": 33.9,
+     "wp0.88": 30.2,
+     "argmin": "0.88 - also wrong"
+    },
+    "argmin_grain_rule_accuracy": "10/23 vs base rate 8/23"
+   },
+   "candidates_not_testable_here": [
+    "work 16 is 2nd highest mean_chroma (86.5, median 41.5) and highest chroma_stddev (43.3) - may be CHROMA noise, invisible to a neutral ramp (B2 territory)",
+    "0.64-pickers average lum_stddev 45.8 vs 0.88-pickers 32.8 (n=7,8, no test performed)"
+   ]
+  },
+  {
+   "id": "B1-F10",
+   "claim": "Round 4 shifted toward LESS compression - an observation, NOT a re-decision of ADR-093",
+   "numbers": {
+    "round3_n11_mean_pick": 0.727,
+    "round4_n12_mean_pick": 0.8,
+    "shift": 0.073,
+    "adr093_recorded_per_work_sd": 0.074,
+    "all_23_mean_pick": 0.765,
+    "picks": {
+     "0.64": 7,
+     "0.76": 8,
+     "0.88": 8
+    }
+   }
+  },
+  {
+   "id": "B1-F11",
+   "claim": "The DIGITAL palette transfer function - exact, needs no rig - is the object that answers both collapses",
+   "numbers": {
+    "ceiling_input": 165,
+    "black_ink_exhausted_at_input": 80,
+    "bare_black_fraction": {
+     "0": 1.0,
+     "10": 0.85,
+     "20": 0.73,
+     "30": 0.59,
+     "40": 0.48,
+     "50": 0.35,
+     "60": 0.22,
+     "70": 0.09,
+     "80": 0.0
+    },
+    "mean_response_is_LINEAR_through_the_shadows": "d20->23.3, d40->44.0, slope 1.03"
+   },
+   "consequence": "black crush is not a cliff in the mean, it is a DILUTION of what the tone is made of. Exact mirror of ADR-091 at the other end: one ink below 71, one above 101"
+  },
+  {
+   "id": "B1-F12",
+   "claim": "The MEASURED rig transfer is a genuine transfer function in level alone - but the rig cannot resolve tone below digital 40, where the render says there is tone",
+   "numbers": {
+    "R2_spline_in_level_alone": 0.933,
+    "R2_adding_wp_and_gamma": 0.955,
+    "within_condition_slope_dT_dd": {
+     "d17-36": -0.29,
+     "d28-52": -0.07,
+     "d21-39": 0.53,
+     "d38-69": 1.54,
+     "d64-90": 2.74,
+     "d75-105": 3.5,
+     "d88-123": 3.22
+    },
+    "slope_se_on_11_points": 0.46,
+    "digital_slope_in_the_same_region": 1.03
+   },
+   "unresolved": "PANEL or CAMERA cannot be separated - no reflectance standard in frame, and ADR-090 already recorded the camera exaggerating collapse (input 112 vs 159)",
+   "do_not_say": "'the panel crushes everything below digital 40' - the honest statement is that the RIG cannot resolve it"
+  },
+  {
+   "id": "B1-F13",
+   "claim": "An S-curve CAN do what no power function can - and the arithmetic needs no rig",
+   "structural": "a power function fixes both endpoints (0->0, 255->255) so it always trades one collapse for the other; a scale moves the top and drags the bottom down in proportion; only a two-free-endpoint map can place both ends inside the usable window [~40,163]",
+   "numbers_on_real_histograms": {
+    "NightWatch": {
+     "production_wp_off_g1.4": {
+      "bare_black_pct": 78.0,
+      "clip_pct": 0.3,
+      "pred_grain": 19.0
+     },
+     "wp0.75_g1.0": {
+      "bare_black_pct": 66.6,
+      "clip_pct": 0.0,
+      "pred_grain": 27.5
+     },
+     "gamma0.75_alone": {
+      "bare_black_pct": 36.4,
+      "clip_pct": 1.3,
+      "pred_grain": 37.6
+     },
+     "S_curve_to_80_163_slope0.75": {
+      "bare_black_pct": 0.0,
+      "clip_pct": 0.0,
+      "pred_grain": 34.1
+     }
+    },
+    "Olympia": {
+     "production_wp_off_g1.4": {
+      "bare_black_pct": 38.1,
+      "clip_pct": 0.6,
+      "pred_grain": 16.1
+     },
+     "wp0.75_g1.0": {
+      "bare_black_pct": 32.4,
+      "clip_pct": 0.0,
+      "pred_grain": 22.9
+     },
+     "gamma0.75_alone": {
+      "bare_black_pct": 16.7,
+      "clip_pct": 39.1,
+      "pred_grain": 24.2
+     },
+     "S_curve_to_80_163_slope0.75": {
+      "bare_black_pct": 0.0,
+      "clip_pct": 0.0,
+      "pred_grain": 20.2
+     }
+    }
+   },
+   "costs": [
+    "the shadow lift deposits content at digital 60-90, and the measured grain ridge peaks at 55 - NightWatch predicted grain 27.5 -> 34.1",
+    "a black point lifted to digital 80 means the image contains NO BLACK at all; the black ink is the one place this panel is unambiguously good. That is a judge question (ADR-084), not a measurement question",
+    "on Olympia the S-curve is a Pareto improvement (0% black, 0% clip, grain 20.2 < 22.9) because its mass is already above the ridge"
+   ],
+   "untestable_here": "no corpus condition has a non-power shape, and the readout built for worming (anisotropy) was ruled unusable by A1"
+  },
+  {
+   "id": "B1-F14",
+   "claim": "linepairs: Floyd-Steinberg loses NOTHING; the entire measured roll-off is the rig",
+   "numbers": {
+    "digital_retained_at_8px": {
+     "h_c80": 0.997,
+     "v_c80": 1.0,
+     "d_c80": 1.0
+    },
+    "measured_retained_wp_off_g1.0_c80": {
+     "8px": {
+      "h": 0.006,
+      "v": 0.0,
+      "d": 0.0
+     },
+     "16px": {
+      "h": 0.401,
+      "v": 0.587,
+      "d": 0.381
+     },
+     "24px": {
+      "h": 0.583,
+      "v": 0.889,
+      "d": 0.651
+     }
+    },
+    "half_modulation_period_px": [
+     16,
+     24
+    ]
+   },
+   "overturns": "the expected DIAGONAL penalty from FS direction bias does not exist - digitally the diagonal is the BEST preserved orientation (1.000 at every period vs 0.80-0.99 vertical)",
+   "no_lever_finding": "one row per setting and `retained` normalises against a 48px reference the levers themselves move"
+  },
+  {
+   "id": "B1-F15",
+   "claim": "resample: the resampler is exonerated",
+   "numbers": {
+    "digital_modulation": {
+     "scale1": 170.0,
+     "scale2": 170.0,
+     "scale4": 170.0
+    },
+    "measured_wp_off": {
+     "scale1": 101.3,
+     "scale2": 97.0,
+     "scale4": 85.3
+    },
+    "measured_wp0.75": {
+     "scale1": 97.0,
+     "scale2": 99.3,
+     "scale4": 87.7
+    }
+   },
+   "consequence": "the ~41% modulation deficit is panel+camera+registration; 'the resampler ate it before the dither saw it' is ruled out",
+   "not_a_finding": "the ~13-unit scale-4 deficit has no replicate and therefore no bar"
+  },
+  {
+   "id": "B1-F16",
+   "claim": "surround: no surround term above the noise, but the target cannot prove it",
+   "numbers": {
+    "digital_spread": {
+     "wp_off": 0.0,
+     "wp0.75": 8.15
+    },
+    "measured_full_spread": {
+     "wp_off": 150.5,
+     "wp0.75": 158.3
+    },
+    "measured_IQR_3_worst_dropped": {
+     "wp_off": 4.9,
+     "wp0.75": 14.0
+    },
+    "floors": {
+     "undithered_refresh_worst": 3.5,
+     "dithered_per_cell": [
+      9,
+      13
+     ]
+    }
+   },
+   "design_flaw": "target_surround assigns its 25 surrounds in INDEX ORDER, so surround value is perfectly confounded with grid position - the black and near-black surrounds are cells 0 and 1, the top-left corner, exactly where registration fails",
+   "correlations": {
+    "r_surround_luminance": [
+     0.514,
+     0.571
+    ],
+    "r_distance_from_centre": [
+     -0.289,
+     -0.361
+    ],
+    "after_dropping_3_worst": {
+     "r_surround": [
+      0.333,
+      0.418
+     ],
+     "r_edge": [
+      -0.359,
+      -0.351
+     ]
+    }
+   },
+   "fix": "shuffle the surround assignment across the grid and take three replicates - three refreshes"
+  }
+ ],
+ "unresolved": [
+  "PANEL vs CAMERA at the shadow end - no reflectance standard in frame",
+  "the +26/255 grid-row term - row and level are perfectly confounded within a condition",
+  "work 16 - a registered prediction failed; likely chroma, which B1 does not own",
+  "edges - the asymmetry question, in either direction",
+  "linepairs - any lever effect (moving normaliser, n=1 per setting)",
+  "surround - value vs position (design confound, no replicate)",
+  "resample - the scale-4 deficit (no replicate)",
+  "worming under an S-curve - anisotropy is unusable",
+  "grain_peak and ramp_span are not recoverable from this corpus at all"
+ ],
+ "recommendations": [
+  {
+   "to": "Pieria, shipping",
+   "what": "white-point 0.75, gamma 1.0 on the neutral-tone evidence; it Pareto-dominates every alternative tested and independently confirms ADR-093"
+  },
+  {
+   "to": "the rig",
+   "what": "a shadow target mirroring tonefine to input 0-100; a reflectance standard in frame to divide out the camera toe; at least one non-power curve condition; a gamma axis that includes values below 1.0"
+  },
+  {
+   "to": "the readouts",
+   "what": [
+    "drop tonefine steps 11,12,24,25 (defect #9)",
+    "re-place readout_edges' strips on the same-polarity transition (defect #10)",
+    "shuffle target_surround's surround assignment across the grid",
+    "sample the calibration strip on corrected-before-align (A1's defect #8) - still the highest-value one-line fix"
+   ]
+  }
+ ]
+}

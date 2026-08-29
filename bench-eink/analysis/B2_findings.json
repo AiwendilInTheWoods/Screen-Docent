@@ -1,0 +1,727 @@
+{
+ "_meta": {
+  "agent": "B2_colour_gamut",
+  "date": "2026-08-29",
+  "corpus_commit": "1063f81",
+  "source": "bench-eink/analysis/A1_rederived.jsonl",
+  "units": "camera-RGB normalised to THIS panel's own black=0/white=255 - NOT sRGB; directions only, never magnitudes",
+  "report": "bench-eink/analysis/B2_colour_gamut.md",
+  "sim_cache": "bench-eink/analysis/B2_sim_cache.json"
+ },
+ "new_defects": {
+  "defect_9_v_lo_v_hi_inert": {
+   "what": "target_huevalue honours --v-lo/--v-hi only on the isolate branch; the default joint branch hard-codes 40..245",
+   "proof": "target_huevalue(v_lo=20,v_hi=100) vs (40,245) on the joint path: identical, max pixel diff 0; on the isolate path max pixel diff 255",
+   "consequence": "the four huevalue_lowv_* rows are NOT a low-value block - they re-shoot the same v=40..245 grid; the shipped value_in labels are CORRECT and A1's relabelling to 20/36/52/68/84/100 must be discarded; the dark end of the hue x value table was never measured",
+   "fix": "one line in target_huevalue, or always pass --isolate for the low-value re-shoot"
+  },
+  "defect_10_inkmix_cell_search_exceeds_cell": {
+   "what": "grid_offsets searches +-30 px per cell; content_box narrowing made inkmix cells 67x86 (docstring still says 101x98), so the search reaches the neighbouring cell and minimum-interior-variance selects it",
+   "proof": "shipped readout has blue+green = [254,253,252] at all five ratios - two dark inks in a checkerboard cannot make paper white",
+   "consequence": "inkmix mixtures, element_sweep and metamer_row are misregistered for 4-7 of 15 columns under every arm tried; the optical mixing law is not measurable from this corpus",
+   "fix": "clamp the per-cell search to a fraction of the cell margin, and re-shoot inkmix at a coarser grid"
+  }
+ },
+ "error_bars_addendum": {
+  "_basis": "4 pairs of BIT-IDENTICAL huevalue renders captured 2.3 h apart with independent alignment solutions (main block vs the mislabelled lowv reshoot). A1's huevalue bars come from replicates that share one alignment.",
+  "cells_chroma_out_single_cross_condition": {
+   "sigma": 28.8,
+   "mdd95": 81,
+   "note": "A1's 15 applies WITHIN one alignment family only"
+  },
+  "mean_chroma_per_value_row": {
+   "sigma": 8.1,
+   "mdd95": 23
+  },
+  "mean_chroma_all_72": {
+   "sigma": 3.5,
+   "mdd95": 9.7
+  },
+  "n_collapsed_total": {
+   "mdd95": 6.2,
+   "note": "A1's 9 is the more conservative; used throughout"
+  },
+  "four_centre_replicates_same_alignment": {
+   "cell_r": 0.99,
+   "cell_rms": 7.3
+  }
+ },
+ "adr_091": {
+  "verdict": "ACCEPTED on mechanism; its TABLE is wrong by ~7.6x; 'not hue-limited' does NOT survive",
+  "table_reproduced_in_output_palette": {
+   "cyan": [
+    4.19,
+    1.87,
+    0.58,
+    0.0
+   ],
+   "blue": [
+    2.19,
+    0.63,
+    0.0,
+    0.0
+   ],
+   "violet": [
+    3.08,
+    0.95,
+    0.02,
+    0.0
+   ],
+   "published": {
+    "cyan": [
+     4.19,
+     1.86,
+     0.58,
+     0.0
+    ],
+    "blue": [
+     2.18,
+     0.64,
+     0.0,
+     0.0
+    ],
+    "violet": [
+     3.08,
+     0.95,
+     0.02,
+     0.0
+    ]
+   },
+   "note": "exact match => ADR-091 measured the OUTPUT palette (pure primaries), i.e. the client encoding, not the ink"
+  },
+  "table_in_dither_palette": {
+   "cyan": [
+    0.55,
+    0.26,
+    0.1,
+    0.03
+   ],
+   "blue": [
+    0.3,
+    0.11,
+    0.04,
+    0.03
+   ],
+   "violet": [
+    0.44,
+    0.14,
+    0.03,
+    0.03
+   ],
+   "consequence": "ADR-091's '250-460% over-saturation at v=100' is an encoding artefact; in ink terms the panel UNDER-saturates there. Its follow-on chroma-attenuation hypothesis must not be actioned as written."
+  },
+  "on_glass_wp0_baseline": {
+   "value_in": [
+    40,
+    81,
+    122,
+    163,
+    204,
+    245
+   ],
+   "mean_chroma": [
+    11.3,
+    56.2,
+    80.1,
+    97.1,
+    74.4,
+    49.2
+   ],
+   "n_collapsed_of_12": [
+    7,
+    0,
+    0,
+    0,
+    1,
+    4
+   ],
+   "verdict": "'every hue survives at v=100' CONFIRMED; 'six collapse by v=220' directionally confirmed but overstated (1 at v=204, 4 at v=245)"
+  },
+  "superposition_test": {
+   "model": "chroma ~ f(v_eff = v_in * wp)",
+   "R2": 0.891,
+   "resid_rms": 9.02,
+   "corr_resid_wp": -0.117,
+   "replicate_scatter": 8.6,
+   "n_captures": 8,
+   "n_rows": 48,
+   "alternative_v_nominal": {
+    "R2": 0.772,
+    "resid_rms": 13.03
+   },
+   "verdict": "white-point acts on chroma PURELY through value - ADR-091's mechanism, confirmed by a test that could have failed"
+  },
+  "hue_dependence": {
+   "corr_serving_ink_luminance_vs_chroma_centroid": 0.764,
+   "permutation_p": 0.0023,
+   "n": 12,
+   "correction": "the luminance limit is HUE-DEPENDENT; hues 150 and 330 are weak at EVERY value (peak 40 and 43 vs 182 at hue 0) and are gamut holes no luminance operator fills"
+  }
+ },
+ "measured_inks_panel_relative": {
+  "black": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "white": [
+   244.4,
+   251.7,
+   249.0
+  ],
+  "red": [
+   233.5,
+   3.5,
+   1.2
+  ],
+  "yellow": [
+   255.0,
+   250.4,
+   65.7
+  ],
+  "blue": [
+   0.4,
+   37.2,
+   111.5
+  ],
+  "green": [
+   74.0,
+   110.2,
+   83.5
+  ],
+  "hue_deg": {
+   "red": 0.5,
+   "yellow": 58.8,
+   "green": 134.7,
+   "blue": 221.0
+  },
+  "camera_rgb_mean": {
+   "black": 0.0,
+   "blue": 49.7,
+   "red": 79.4,
+   "green": 89.2,
+   "yellow": 190.3,
+   "white": 248.4
+  },
+  "vs_palette": {
+   "hue_agreement_deg": {
+    "yellow": 1.2,
+    "green": 4.1,
+    "red": 2.0,
+    "blue": 23.7
+   },
+   "warning": "camera over-saturates by construction - directions only; NEVER rewrite SPECTRA6_DITHER_PALETTE from this. A colorimeter or an in-frame ColorChecker is required."
+  }
+ },
+ "wp_x_chroma_interaction": {
+  "design": "complete 2^4 factorial in block 2 (rows 48-112, randomisation verified by A1): wp{0.64,0.88} x gamma{1.0,1.8} x k{1.0,2.0} x sat{0.7,1.3}, 16/16 corners",
+  "resolution_for_an_effect": 11.3,
+  "effects_top_value_row_v245": {
+   "k": -29.31,
+   "gamma": 24.8,
+   "wp_x_gamma": 19.58,
+   "wp_x_k": -14.34,
+   "wp": -13.73,
+   "gamma_x_k": 12.16,
+   "sat": 9.19
+  },
+  "cell_means_top_row": {
+   "wp0.64_k1.0": 81.9,
+   "wp0.64_k2.0": 67.0,
+   "wp0.88_k1.0": 82.6,
+   "wp0.88_k2.0": 38.9
+  },
+  "verdict": "REAL, ~3x: the chroma lever costs 43.7/255 at wp 0.88 and 14.9 at wp 0.64. The two white-points are indistinguishable with the chroma lever OFF.",
+  "block1_for_continuity_only": {
+   "note": "wp aliased with capture time (A1 r=+0.883)",
+   "top_row_mean_chroma": {
+    "wp0.0": [
+     49.2,
+     15.4,
+     3.7
+    ],
+    "wp0.64": [
+     105.7,
+     85.3,
+     51.2
+    ],
+    "wp0.75": [
+     61.1,
+     41.9,
+     25.9
+    ],
+    "wp0.88": [
+     43.6,
+     21.2,
+     8.8
+    ]
+   },
+   "k_levels": [
+    1.0,
+    1.5,
+    2.0
+   ]
+  },
+  "adr_088": "supports the brief's diagnosis: at wp off the top of the range holds 49.2 chroma with the lever off and 3.7 with k=2.0 (8/12 hues collapsed) - the lever was judged where the colour had already gone"
+ },
+ "dither_bleed_joint_vs_isolate": {
+  "glass_delta_mean_chroma": 6.0,
+  "simulated_delta": 6.1,
+  "per_row_glass": [
+   0.4,
+   -7.1,
+   -5.9,
+   3.3,
+   18.3,
+   26.7
+  ],
+  "per_row_sim": [
+   0.4,
+   1.4,
+   4.2,
+   7.2,
+   11.1,
+   11.9
+  ],
+  "verdict": "FS cross-cell bleed costs 6.0/255 of grid-mean chroma on huevalue; it is in the RENDER not the instrument, and is predictable offline. Bounds A1's open surround term for this target only."
+ },
+ "simulator_validation": {
+  "what": "render each condition through the exact _pre chain, map the output-palette result onto THIS panel's measured inks, compose, run the same readout_huevalue",
+  "measured_inks": {
+   "per_cell": {
+    "r": 0.596,
+    "rms": 41.9,
+    "bias": -2.0
+   },
+   "per_value_row": {
+    "r": 0.932,
+    "rms": 12.3
+   }
+  },
+  "pimoroni": {
+   "per_cell": {
+    "r": 0.636,
+    "rms": 42.2,
+    "bias": 15.3
+   },
+   "per_value_row": {
+    "r": 0.927,
+    "rms": 23.2,
+    "bias": 15.3
+   }
+  },
+  "glass_vs_glass_bit_identical": {
+   "per_cell_rms": 36.5,
+   "per_value_row_rms": 10.1
+  },
+  "verdict": "the simulator predicts the panel as well as the panel predicts itself; per-cell disagreement is registration, not model error"
+ },
+ "chroma_survival": {
+  "_what": "measured output chroma as a function of what the quantiser was ASKED for: C_out ~= S(L_in) * C_in",
+  "_units": "L_in, C_in = mean and (max-min) of the pre-quantise RGB, 0-255; C_out panel-relative",
+  "_domain": "C_in >= 25; fitted on 3528 cells from 50 huevalue conditions",
+  "model": "S(L) = S0 / (1 + exp((L - L50)/w))",
+  "all_hues": {
+   "S0": 1.3,
+   "L50": 152.0,
+   "w": 15.0,
+   "R2": 0.845,
+   "resid_rms": 0.161
+  },
+  "quantiles": {
+   "S=90%_of_plateau": 119.0,
+   "S=75%": 135.5,
+   "S=50%": 152.0,
+   "S=25%": 168.5,
+   "S=10%": 185.0
+  },
+  "by_hue_S0_L50_w": {
+   "0": [
+    0.9,
+    150.0,
+    7.0
+   ],
+   "30": [
+    1.8800000000000008,
+    169.0,
+    8.0
+   ],
+   "60": [
+    2.000000000000001,
+    170.0,
+    10.0
+   ],
+   "90": [
+    1.7200000000000006,
+    154.0,
+    11.0
+   ],
+   "120": [
+    1.04,
+    143.0,
+    8.0
+   ],
+   "150": [
+    0.9,
+    132.0,
+    36.0
+   ],
+   "180": [
+    0.92,
+    120.0,
+    13.0
+   ],
+   "210": [
+    1.7200000000000006,
+    117.0,
+    18.0
+   ],
+   "240": [
+    2.000000000000001,
+    123.0,
+    22.0
+   ],
+   "270": [
+    2.000000000000001,
+    100.0,
+    21.0
+   ],
+   "300": [
+    1.5600000000000005,
+    89.0,
+    59.0
+   ],
+   "330": [
+    1.1600000000000001,
+    144.0,
+    6.0
+   ]
+  },
+  "by_hue_note": "hues 150 and 300 fit a near-flat curve (w=36 and 59); their L50 is poorly determined",
+  "corr_serving_ink_luminance_vs_L50": 0.77,
+  "permutation_p": 0.0033,
+  "binned_S_of_L": [
+   {
+    "L_in": 15.0,
+    "S": 0.815,
+    "n": 13
+   },
+   {
+    "L_in": 25.0,
+    "S": 1.008,
+    "n": 54
+   },
+   {
+    "L_in": 35.0,
+    "S": 1.039,
+    "n": 132
+   },
+   {
+    "L_in": 45.0,
+    "S": 1.176,
+    "n": 172
+   },
+   {
+    "L_in": 55.0,
+    "S": 1.345,
+    "n": 186
+   },
+   {
+    "L_in": 65.0,
+    "S": 1.317,
+    "n": 241
+   },
+   {
+    "L_in": 75.0,
+    "S": 1.431,
+    "n": 201
+   },
+   {
+    "L_in": 85.0,
+    "S": 1.273,
+    "n": 194
+   },
+   {
+    "L_in": 95.0,
+    "S": 1.391,
+    "n": 189
+   },
+   {
+    "L_in": 105.0,
+    "S": 1.308,
+    "n": 203
+   },
+   {
+    "L_in": 115.0,
+    "S": 1.278,
+    "n": 186
+   },
+   {
+    "L_in": 125.0,
+    "S": 1.046,
+    "n": 128
+   },
+   {
+    "L_in": 135.0,
+    "S": 0.93,
+    "n": 158
+   },
+   {
+    "L_in": 145.0,
+    "S": 0.721,
+    "n": 85
+   },
+   {
+    "L_in": 155.0,
+    "S": 0.581,
+    "n": 75
+   },
+   {
+    "L_in": 165.0,
+    "S": 0.48,
+    "n": 38
+   },
+   {
+    "L_in": 175.0,
+    "S": 0.256,
+    "n": 51
+   },
+   {
+    "L_in": 185.0,
+    "S": 0.213,
+    "n": 25
+   },
+   {
+    "L_in": 195.0,
+    "S": 0.178,
+    "n": 25
+   }
+  ],
+  "coverage_of_L_in": {
+   "0-60": {
+    "n": 1642,
+    "C_in_min": 1.0,
+    "C_in_max": 109.0
+   },
+   "60-100": {
+    "n": 900,
+    "C_in_min": 14.0,
+    "C_in_max": 183.0
+   },
+   "100-140": {
+    "n": 675,
+    "C_in_min": 28.0,
+    "C_in_max": 200.0
+   },
+   "140-170": {
+    "n": 198,
+    "C_in_min": 33.0,
+    "C_in_max": 191.0
+   },
+   "170-200": {
+    "n": 101,
+    "C_in_min": 45.0,
+    "C_in_max": 155.0
+   },
+   "200-225": {
+    "n": 12,
+    "C_in_min": 74.0,
+    "C_in_max": 100.0
+   },
+   "225-256": {
+    "n": 0,
+    "C_in_min": null,
+    "C_in_max": null
+   }
+  },
+  "coverage_warning": "the pale-AND-chromatic corner (L_in>140 with C_in<30) is EMPTY - exactly Olympia's regime. Figures there come from the validated simulator, i.e. extrapolation.",
+  "flat_patch_ceiling_C_in_27.5": {
+   "L_in": [
+    100,
+    120,
+    140,
+    160,
+    180,
+    200,
+    220,
+    240
+   ],
+   "hue_0": [
+    85.6,
+    88.1,
+    81.1,
+    31.5,
+    7.2,
+    7.2,
+    7.2,
+    7.2
+   ],
+   "hue_30": [
+    81.1,
+    72.7,
+    62.3,
+    25.7,
+    7.2,
+    7.2,
+    7.2,
+    7.2
+   ],
+   "hue_210": [
+    55.8,
+    45.2,
+    25.0,
+    7.2,
+    7.2,
+    7.2,
+    7.2,
+    7.2
+   ],
+   "hue_300": [
+    30.0,
+    34.2,
+    27.7,
+    7.2,
+    7.2,
+    7.2,
+    7.2,
+    7.2
+   ],
+   "note": "7.2 = the white ink's own chroma, i.e. the patch is 100% white ink and DEAD",
+   "source": "validated measured-ink simulator, not a photograph"
+  },
+  "tone_curve_chroma_budget": {
+   "rule": "a curve L -> 255*(L/255)^gamma pushes a pixel over the 163 ink ceiling when L > 255*(163/255)**(1/gamma); everything with colour between that line and 163 loses it",
+   "threshold_by_gamma": {
+    "1.0": 163.0,
+    "0.95": 159.2,
+    "0.9": 155.1,
+    "0.85": 150.6,
+    "0.8": 145.7,
+    "0.75": 140.4,
+    "0.7": 134.6,
+    "0.6": 121.0,
+    "0.5": 104.2
+   },
+   "population_check": {
+    "gamma": [
+     1.0,
+     0.9,
+     0.75,
+     0.6
+    ],
+    "simulated_mean_surviving_chroma": [
+     24.3,
+     19.3,
+     11.4,
+     3.3
+    ],
+    "simulated_bare_white_fraction": [
+     0.798,
+     0.852,
+     0.924,
+     0.978
+    ],
+    "note": "toy population C_in=27.5, hues 0/30/300, L_in uniform 110-210, on the measured-ink simulator",
+    "olympia_measured_chroma": [
+     31.6,
+     27.0,
+     10.3,
+     4.2
+    ],
+    "olympia_measured_bare_white_fraction": [
+     0.751,
+     0.825,
+     0.953,
+     0.999
+    ]
+   },
+   "reconciliation": "ADR-090's ink ceiling (163) and this corpus's chroma half-life (152) are the same number from independent targets. ADR-091 read as a permission (compression buys gamut) is the same statement as: every luminance LIFT spends colour, at a rate computable from the work's histogram."
+  },
+  "limits": [
+   "corpus has no gamma < 1 - lifting was never photographed; the survival function covers the luminances a lift reaches but the equivalence relies on the v_eff superposition, which is verified for white-point and untested for gamma<1",
+   "L_in > 220 unreached; L_in > 140 with C_in < 30 unreached",
+   "the dark end (L_in < 50) is confounded with the rig's ~24/255 black-end lift",
+   "12 hues at 30 deg spacing"
+  ]
+ },
+ "inkmix_provisional": {
+  "status": "NOT MEASURABLE from this corpus - two law-free registration criteria disagree; see defect 10",
+  "best_effort_alignment": {
+   "scale": 0.91,
+   "dx": 22,
+   "dy": -64,
+   "monotone_of_45": 41,
+   "digital_truth": 45,
+   "columns_reading_own_design": "10 of 15"
+  },
+  "mixing_exponent_scan": {
+   "0.6": 22.5,
+   "0.7": 19.1,
+   "0.8": 16.4,
+   "0.9": 14.6,
+   "1.0": 14.15,
+   "1.1": 14.8,
+   "1.2": 15.9,
+   "1.4": 18.4,
+   "1.8": 24.1,
+   "2.2": 29.2
+  },
+  "mixing_space": "optimum gamma ~0.9-1.0: panel-relative camera RGB is already a mixing-linear space for this rig, because the readout averages ENCODED pixels over a window and the affine is applied to encoded values. A 2.2 decode ADDS error.",
+  "dot_gain_effective_coverage": {
+   "nominal": [
+    0.125,
+    0.25,
+    0.5,
+    0.75,
+    0.875
+   ],
+   "accepted_columns": [
+    0.013,
+    0.192,
+    0.526,
+    0.766,
+    0.873
+   ],
+   "black_white_only": [
+    0.06,
+    0.223,
+    0.556,
+    0.796,
+    0.884
+   ],
+   "verdict": "coverage within +-0.06 of nominal; the shipped 'far darker than linear' reading is a registration artefact, not dot gain"
+  },
+  "element_size_sweep": {
+   "pitch_px": [
+    1,
+    2,
+    4,
+    8,
+    16
+   ],
+   "black_white": [
+    130.3,
+    137.8,
+    133.9,
+    126.7,
+    115.7
+   ],
+   "white_yellow": [
+    214.7,
+    213.9,
+    214.3,
+    214.9,
+    218.9
+   ],
+   "black_red_REJECTED": [
+    79.8,
+    106.9,
+    109.5,
+    54.0,
+    46.6
+   ],
+   "verdict": "a 16x change in element pitch moves a chromatic mixture 5.0/255, while the strip-vs-field disagreement is 42-78/255. Element size does NOT explain the patch-size effect; that is patch size and surround (lateral scatter)."
+  },
+  "metamer": "UNANSWERED - only one designed pair falls within 20/255 under the additive model, and the instrument is not trusted. Needs a re-shoot at a coarser cell pitch."
+ }
+}

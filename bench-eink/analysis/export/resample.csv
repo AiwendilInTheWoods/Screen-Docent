@@ -1,0 +1,7 @@
+cond,white_point,gamma,chroma_gamma,saturation,source_scale,modulation,sd
+resample_wp0.75_g1.0_k1.0_s1.0,0.75,1.0,1.0,1.0,1,97.0,35.23
+resample_wp0.75_g1.0_k1.0_s1.0,0.75,1.0,1.0,1.0,2,99.33,38.62
+resample_wp0.75_g1.0_k1.0_s1.0,0.75,1.0,1.0,1.0,4,87.67,33.74
+resample_wp0.0_g1.0_k1.0_s1.0,0.0,1.0,1.0,1.0,1,101.33,37.84
+resample_wp0.0_g1.0_k1.0_s1.0,0.0,1.0,1.0,1.0,2,97.0,36.62
+resample_wp0.0_g1.0_k1.0_s1.0,0.0,1.0,1.0,1.0,4,85.33,32.39

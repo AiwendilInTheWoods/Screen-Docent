@@ -1,0 +1,16 @@
+cond,ink_a,ink_b,element_px,fraction_a,out_r,out_g,out_b
+inkmix,black,white,1,0.5,93.5,103.5,113.45
+inkmix,black,white,2,0.5,122.73,125.0,125.47
+inkmix,black,white,4,0.5,133.99,129.79,128.28
+inkmix,black,white,8,0.5,152.31,144.11,142.34
+inkmix,black,white,16,0.5,169.05,158.1,145.11
+inkmix,white,yellow,1,0.5,254.99,247.76,161.62
+inkmix,white,yellow,2,0.5,255.0,248.41,163.51
+inkmix,white,yellow,4,0.5,254.78,250.42,174.39
+inkmix,white,yellow,8,0.5,254.9,250.91,178.6
+inkmix,white,yellow,16,0.5,107.52,5.01,3.7
+inkmix,black,red,1,0.5,161.52,71.32,68.64
+inkmix,black,red,2,0.5,175.91,68.88,68.17
+inkmix,black,red,4,0.5,142.21,24.01,21.25
+inkmix,black,red,8,0.5,150.69,66.58,62.93
+inkmix,black,red,16,0.5,252.0,253.36,252.31

@@ -1,0 +1,13 @@
+cond,white_point,gamma,chroma_gamma,saturation,ink,out_r,out_g,out_b
+primaries#1,,,,,black,0.0,0.0,0.0
+primaries#1,,,,,white,245.5,252.5,250.1
+primaries#1,,,,,red,235.8,2.9,0.8
+primaries#1,,,,,yellow,255.0,251.7,65.1
+primaries#1,,,,,blue,0.6,39.4,111.5
+primaries#1,,,,,green,68.2,107.5,78.6
+primaries#2,,,,,black,0.0,0.0,0.0
+primaries#2,,,,,white,243.4,250.9,247.9
+primaries#2,,,,,red,231.2,4.2,1.6
+primaries#2,,,,,yellow,255.0,249.1,66.2
+primaries#2,,,,,blue,0.2,35.1,111.4
+primaries#2,,,,,green,79.8,112.9,88.5
