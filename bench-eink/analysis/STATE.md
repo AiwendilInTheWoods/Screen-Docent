@@ -4,6 +4,13 @@
 **Plan:** `/home/josh/.claude/plans/good-morning-get-eager-puffin.md`
 **Standing rules (every agent):** `bench-eink/analysis/briefs/STANDING_RULES.md`
 
+## ⚠️ RULE: "RUNNING" MEANS LAUNCHED, NOT INTENDED
+A phase may only be marked RUNNING once the agent has actually been dispatched and returned an id.
+On 2026-08-29 Phase B was marked RUNNING, committed, and reported to Josh as running — while no agent
+had been launched at all. It sat idle ~40 min and the state file asserted a falsehood the whole time.
+This is the same failure mode as the instrument defects this project keeps finding: a record that
+could only say "yes". Record evidence, not intent.
+
 ## How to resume after a session limit
 1. Read this file. 2. Read the last completed phase's report. 3. Launch the next phase using its brief
 in `bench-eink/analysis/briefs/`. The briefs are self-contained — no conversation context is required.
@@ -15,9 +22,9 @@ findings are usable, re-run it.
 | # | agent | model | brief | output | status |
 |---|---|---|---|---|---|
 | A | integrity | Opus | `briefs/A1_integrity.md` | `A1_integrity.md`, `error_bars.json`, `A1_rederived.jsonl` | **COMPLETE** |
-| B1 | tone-structure | Opus | `briefs/B1_tone_structure.md` | `B1_tone_structure.md` | **RUNNING** |
-| B2 | colour-gamut | Opus | `briefs/B2_colour_gamut.md` | `B2_colour_gamut.md` | **RUNNING** |
-| B3 | normalise-export | Sonnet | `briefs/B3_export.md` | `export/` | **RUNNING** |
+| B1 | tone-structure | Opus | `briefs/B1_tone_structure.md` | `B1_tone_structure.md` | **RUNNING** (launched 17:10) |
+| B2 | colour-gamut | Opus | `briefs/B2_colour_gamut.md` | `B2_colour_gamut.md` | **RUNNING** (launched 17:10) |
+| B3 | normalise-export | Sonnet | `briefs/B3_export.md` | `export/` | **RUNNING** (launched 17:10) |
 | C | skeptic | Fable | `briefs/C1_skeptic.md` | `C1_verdicts.md` | pending |
 | D | findings | Opus | `briefs/D1_findings.md` | `docs/eink-findings-2026-08-29.md` | pending |
 | E1 | project-skill | Opus | `briefs/E1_project_skill.md` | `.claude/skills/eink-panel/` | pending |
@@ -43,6 +50,14 @@ strip readout samples nominal coordinates on it, so the affine's own anchors —
 255 by construction — read black [61.6, 52.5, 37.3] and white [226, 235, 230]. That invalidates
 `strip`, `field_vs_strip`, `worst_disagreement` and `linearity_error` in both shipped files. Same
 signature as the other seven: a check that could only pass.
+
+## Human judgements banked alongside this run
+Round 4 (2026-08-29): 12 blinded three-level white-point judgements on OIL PAINTINGS.
+Result: wp 0.64 x3, 0.76 x2, **0.88 x7**, mean 0.800 — against yesterday's mixed-class mean of 0.727
+and the shipped constant of 0.75. n goes 11 -> 23. Anchoring tested by re-fitting without the three
+prior-exposure works: n=9, mean 0.813, i.e. FURTHER from 0.75, so anchoring is not the explanation.
+⚠️ Not a clean comparison — today was blinded and lit at 5000K D50, yesterday's protocol was neither.
+Files: `bench-eink/wp3_labels.jsonl`, `wp3_round2_blinding.json`, `wp3_round2_notes.json`.
 
 ## NEXT ACTION
 Phase B running (B1, B2, B3 in parallel). When all three end with `## STATUS: COMPLETE`, read them,
