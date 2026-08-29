@@ -59,6 +59,16 @@ prior-exposure works: n=9, mean 0.813, i.e. FURTHER from 0.75, so anchoring is n
 ⚠️ Not a clean comparison — today was blinded and lit at 5000K D50, yesterday's protocol was neither.
 Files: `bench-eink/wp3_labels.jsonl`, `wp3_round2_blinding.json`, `wp3_round2_notes.json`.
 
+## ⏭ RESUME HERE (2026-08-29 checkpoint)
+**Read `NEXT_SESSION.md` first** — it carries the S-curve state and the ordered next steps.
+Josh is wiring up a Jupyter notebook; the curve-fitting work is what it is for.
+
+Short version: the S-curve tool is built and its OBJECTIVE is the open problem. Do NOT tune weights
+again. Constrain the curve family so degenerate solutions are inexpressible, then validate the
+objective against the 23 human judgements in `wp3_labels.jsonl` BEFORE fitting anything with it.
+
+Phases C–F (skeptic, findings, skills, review) have briefs on disk and are NOT yet dispatched.
+
 ## NEXT ACTION
 Phase B running (B1, B2, B3 in parallel). When all three end with `## STATUS: COMPLETE`, read them,
 check their claims against `error_bars.json`, record a gate verdict, then launch C (skeptic, Fable)
