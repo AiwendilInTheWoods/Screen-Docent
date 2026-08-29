@@ -1,0 +1,315 @@
+{
+ "_meta": {
+  "produced_by": "A1_integrity",
+  "date": "2026-08-29",
+  "corpus_commit": "1063f81",
+  "units": "camera-RGB normalised to THIS panel's own black=0 / white=255 - NOT sRGB",
+  "use_this_file": "bench-eink/analysis/A1_rederived.jsonl",
+  "do_not_use": [
+   "bench-eink/panel_profile.jsonl (mixes two alignment regimes across 48/119 rows)",
+   "bench-eink/panel_profile_rederived.jsonl (113 rows, no flat interpolation)"
+  ],
+  "sigma_definition": "1 standard deviation of a SINGLE measurement, pooled within groups of bit-identical renders where available",
+  "mdd_definition": "minimum detectable difference between two single measurements, 95% two-sided = 2.8 * sigma",
+  "report": "bench-eink/analysis/A1_integrity.md"
+ },
+ "headline_rule": {
+  "text": "Compare AGGREGATES, never single steps or single cells. Per-step/per-cell differences up to 143/255 were measured between BIT-IDENTICAL renders.",
+  "single_step_out_lum_mdd": 26.0,
+  "aggregate_out_lum_mdd": 11.0
+ },
+ "tonefine": {
+  "_basis": "pooled within 6 identical-render groups (wp,gamma), 36 rows, 30 df; saturation and chroma-gamma are bit-identical no-ops on a neutral target (verified digitally, max pixel diff 0)",
+  "steps_out_lum_single": {
+   "sigma": 9.22,
+   "sigma_mean": 12.12,
+   "sigma_p90": 22.22,
+   "sigma_max": 30.74,
+   "mdd95": 25.8
+  },
+  "steps_out_lum_mean26": {
+   "sigma": 4.09,
+   "mdd95": 11.5
+  },
+  "steps_out_lum_mean_lower13": {
+   "sigma": 4.41,
+   "mdd95": 12.3
+  },
+  "steps_out_lum_mean_upper13": {
+   "sigma": 4.82,
+   "mdd95": 13.5
+  },
+  "steps_grain_single": {
+   "sigma": 13.05,
+   "mdd95": 36.5
+  },
+  "steps_grain_mean26": {
+   "sigma": 2.32,
+   "mdd95": 6.5
+  },
+  "grain_peak": {
+   "sigma": 10.74,
+   "mdd95": 30.1
+  },
+  "steps_chroma_single": {
+   "sigma": 4.06,
+   "mdd95": 11.4
+  },
+  "max_chroma_on_neutral_axis": {
+   "sigma": 3.78,
+   "mdd95": 10.6
+  },
+  "collapsed_step_pairs": {
+   "sigma": 1.37,
+   "mdd95": 3.8,
+   "of": 25
+  },
+  "monotone_step_pairs": {
+   "sigma": 1.75,
+   "mdd95": 4.9,
+   "of": 25,
+   "observed_mean": 17.06,
+   "digital_truth": 25
+  },
+  "ramp_span": {
+   "sigma": 5.91,
+   "mdd95": 16.6
+  },
+  "hue_qualifying_steps": {
+   "sigma": 2.02,
+   "mdd95": 5.7
+  },
+  "neutral_hue_range_deg": {
+   "sigma": 32.95,
+   "mdd95": 92.3,
+   "verdict": "UNUSABLE - do not report"
+  },
+  "steps_anisotropy_single": {
+   "sigma_median": 0.07,
+   "sigma_mean": 2.53,
+   "sigma_max": 52.1,
+   "verdict": "heavy-tailed; use the median over steps, never a single step"
+  }
+ },
+ "huevalue": {
+  "_basis": "4 centre replicates (they share one alignment) x 1.45 inflation transferred from the tonefine measurement of the alignment lottery; the factor is an ESTIMATE, not a measurement",
+  "_inflation_factor": 1.45,
+  "cells_chroma_out_single": {
+   "sigma_replicates": 3.72,
+   "sigma": 5.4,
+   "mdd95": 15.1
+  },
+  "cells_lum_out_single": {
+   "sigma_replicates": 6.19,
+   "sigma": 9.0,
+   "mdd95": 25.2
+  },
+  "mean_chroma_per_value_row": {
+   "sigma_replicates_worst": 3.66,
+   "sigma": 5.3,
+   "mdd95": 14.9,
+   "cells": 12
+  },
+  "mean_chroma_all": {
+   "sigma_replicates": 0.81,
+   "sigma": 1.2,
+   "mdd95": 3.3,
+   "cells": 72
+  },
+  "n_collapsed_per_value_row": {
+   "sigma_replicates": 1.0,
+   "sigma": 1.4,
+   "mdd95": 4.0,
+   "of": 12
+  },
+  "n_collapsed_total": {
+   "sigma_replicates": 2.22,
+   "sigma": 3.2,
+   "mdd95": 9.0,
+   "of": 72
+  },
+  "lum_monotone_pairs": {
+   "observed_mean": 46.06,
+   "of": 60,
+   "digital_truth": 60
+  }
+ },
+ "undithered": {
+  "_basis": "primaries#1 vs primaries#2, two separate refreshes 46 s apart",
+  "strip_patch_250x96_correctly_sampled": {
+   "worst": 3.5,
+   "mean": 0.88,
+   "rms": 1.4
+  },
+  "ink_field_509x345": {
+   "worst": 11.6,
+   "mean": 2.67,
+   "note": "worst is green alone; every other ink <= 4"
+  },
+  "as_published_in_docs": {
+   "worst": 20.7,
+   "mean": 9.85,
+   "verdict": "SUPERSEDED - contaminated by instrument defect #8"
+  },
+  "camera_only_repeatability": {
+   "value": 0.9,
+   "source": "docs, not re-measured here"
+  }
+ },
+ "invalid_fields": {
+  "_reason": "instrument defect #8 - the calibration strip is sampled at nominal coordinates on the ALIGNED image, which has been displaced to register the CONTENT",
+  "fields": [
+   "readout.strip.*",
+   "readout.field_vs_strip.*",
+   "readout.worst_disagreement",
+   "readout.linearity_error.*",
+   "readout.worst_linearity_error",
+   "readout.spread / readout.sd / readout.centre_out on the two surround rows",
+   "gain and offset in any re-derived row (stale, carried from the in-run record)"
+  ],
+  "surround_evidence": {
+   "digital_spread_wp0": 0.0,
+   "digital_spread_wp0.75": 8.15,
+   "measured_spread_wp0": 150.45,
+   "measured_spread_wp0.75": 158.26,
+   "digital_spread_at_24px_shift": 157.7
+  }
+ },
+ "randomisation": {
+  "held": "PARTIALLY",
+  "block2_central_composite_rows_48_112": {
+   "randomised": true,
+   "max_abs_r_with_time": 0.118,
+   "min_p": 0.35
+  },
+  "block1_crossed_rows_3_47": {
+   "randomised": false,
+   "note": "literal design order",
+   "wp_vs_time_within_tonefine_cross": {
+    "r": 0.883,
+    "p": 0.0001,
+    "n": 12,
+    "window_min": 8.5
+   },
+   "wp_vs_time_within_huevalue_cross": {
+    "r": 0.883,
+    "p": 0.0001,
+    "n": 12,
+    "window_min": 8.6
+   }
+  },
+  "rule": "A white-point effect estimated ONLY from rows 3-14 or 18-29 carries an illumination-drift term. Confirm it against the block-2 rows, where wp 0.0/0.64/0.75/0.88/1.0 all recur in randomised order. gamma, chroma and saturation are not aliased anywhere."
+ },
+ "time_dependence": {
+  "sensor_noise_grew": {
+   "factor": 1.76,
+   "early_0_40min": 12.8,
+   "late_40_105min": 22.4,
+   "quantity": "patch_residual * affine gain, panel-relative"
+  },
+  "readout_precision_did_not": {
+   "corr_time_vs_residual": -0.368,
+   "mean_abs_residual_0_40min": 10.6,
+   "mean_abs_residual_70_105min": 6.71
+  },
+  "verdict": "Use ONE error bar for the whole session. Readout error is alignment-dominated, not photon-dominated."
+ },
+ "excluded_rows": [
+  {
+   "cond": "uniformity@180",
+   "reason": "affine failed, gain 255000 (panel rotated 180, strip sampled upside down)",
+   "recoverable": "rotate the RAW 180 before rectifying -> gain [2.51,2.59,2.64], residual 12.26; with flat_final.png -> [2.65,2.46,2.52], residual 11.45"
+  }
+ ],
+ "scoped_rows": [
+  {
+   "cond": [
+    "huevalue_lowv_wp0.0_g1.0",
+    "huevalue_lowv_wp0.64_g1.0",
+    "huevalue_lowv_wp0.75_g1.0",
+    "huevalue_lowv_wp0.88_g1.0"
+   ],
+   "issues": [
+    "value_in labels are WRONG: readout hard-codes 40..245; the render used --v-lo 20 --v-hi 100 so true inputs are 20/36/52/68/84/100",
+    "corrected with the pre-rotation flat; their correct flat is flat_final.png",
+    "alignment reference rebuilt at the default v-range, so it does not match the render"
+   ],
+   "use": "within-block white-point comparison only; do not pool with the other huevalue rows"
+  },
+  {
+   "cond": [
+    "uniformity@0"
+   ],
+   "issues": [
+    "no working 180-degree partner"
+   ],
+   "use": "not interpretable alone"
+  }
+ ],
+ "alignment": {
+  "rows_pinned_at_translation_search_limit": {
+   "count": 32,
+   "of": 119,
+   "limit_px": 88
+  },
+  "rows_on_a_scale_search_edge": {
+   "count": 45,
+   "of": 119,
+   "edges": [
+    0.96,
+    1.04
+   ]
+  },
+  "per_kind_median": {
+   "primaries": [
+    0.96,
+    22,
+    -44
+   ],
+   "edges": [
+    0.96,
+    18,
+    -28
+   ],
+   "surround": [
+    0.97,
+    -6,
+    -24
+   ],
+   "tonefine": [
+    0.98,
+    72,
+    -28
+   ],
+   "huevalue": [
+    0.98,
+    -72,
+    -24
+   ],
+   "linepairs": [
+    0.98,
+    -80,
+    -24
+   ]
+  },
+  "offline_improvement_available": {
+   "how": "force each KIND's median (scale,dx,dy) as align_prior in cmd_rederive",
+   "tonefine_monotone_pairs": {
+    "before": 17.06,
+    "after": 19.21,
+    "of": 25
+   },
+   "tonefine_sigma_out_lum": {
+    "before": 9.22,
+    "after": 6.64
+   },
+   "tonefine_sigma_grain": {
+    "before": 13.05,
+    "after": 5.91
+   },
+   "applied_to_A1_rederived": false,
+   "note": "NOT applied - A1_rederived.jsonl is the standard re-derive and the shipped sigmas describe it as it stands"
+  },
+  "not_fully_fixable": "even at the best alignment the ramp reaches 19.2/25, not 25/25; ~23% of the wobble is non-global distortion the homography cannot report"
+ }
+}

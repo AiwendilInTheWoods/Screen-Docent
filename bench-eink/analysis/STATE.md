@@ -14,10 +14,10 @@ findings are usable, re-run it.
 
 | # | agent | model | brief | output | status |
 |---|---|---|---|---|---|
-| A | integrity | Opus | `briefs/A1_integrity.md` | `A1_integrity.md`, `error_bars.json` | **RUNNING** |
-| B1 | tone-structure | Opus | `briefs/B1_tone_structure.md` | `B1_tone_structure.md` | pending |
-| B2 | colour-gamut | Opus | `briefs/B2_colour_gamut.md` | `B2_colour_gamut.md` | pending |
-| B3 | normalise-export | Sonnet | `briefs/B3_export.md` | `export/` | pending |
+| A | integrity | Opus | `briefs/A1_integrity.md` | `A1_integrity.md`, `error_bars.json`, `A1_rederived.jsonl` | **COMPLETE** |
+| B1 | tone-structure | Opus | `briefs/B1_tone_structure.md` | `B1_tone_structure.md` | **RUNNING** |
+| B2 | colour-gamut | Opus | `briefs/B2_colour_gamut.md` | `B2_colour_gamut.md` | **RUNNING** |
+| B3 | normalise-export | Sonnet | `briefs/B3_export.md` | `export/` | **RUNNING** |
 | C | skeptic | Fable | `briefs/C1_skeptic.md` | `C1_verdicts.md` | pending |
 | D | findings | Opus | `briefs/D1_findings.md` | `docs/eink-findings-2026-08-29.md` | pending |
 | E1 | project-skill | Opus | `briefs/E1_project_skill.md` | `.claude/skills/eink-panel/` | pending |
@@ -25,8 +25,26 @@ findings are usable, re-run it.
 | F | final-review | Fable | `briefs/F1_review.md` | `F1_review.md` | pending |
 
 ## Gate verdicts
-_(recorded by the orchestrator after reading each phase)_
+
+### Gate A — PASSED, with three consequences that bind every later phase
+1. **Use `A1_rederived.jsonl`, NOT `panel_profile.jsonl`.** The shipped file mixes two alignment
+   regimes (48/119 rows carry a stale global prior) and marks two blown-affine rows `ok: true`
+   (verified: `huevalue_wp0.75_g1.0_k2.0_s1.0_hf0.5` has gain 255000).
+2. **The published ~16/255 floor is SUPERSEDED** — it was itself measured through a defect. Use the
+   per-metric bars in `error_bars.json`. A single tonefine step needs 26/255 to be a finding; a mean
+   over 26 steps needs 11.
+3. ⚠️ **RANDOMISATION ONLY PARTIALLY HELD.** Rows 3-47 ran in literal design order with white-point as
+   the OUTER loop, so wp is aliased with capture time at r = +0.883 there. Rows 48-112 are properly
+   randomised (max |r| = 0.118). **Any white-point finding must be established on rows 48-112**, where
+   every wp level was re-measured under randomisation. Gamma, chroma and saturation are clean throughout.
+
+**Instrument defect #8, found by A1 and provable:** `read_panel` returns the ALIGNED image but the
+strip readout samples nominal coordinates on it, so the affine's own anchors — which must read 0 and
+255 by construction — read black [61.6, 52.5, 37.3] and white [226, 235, 230]. That invalidates
+`strip`, `field_vs_strip`, `worst_disagreement` and `linearity_error` in both shipped files. Same
+signature as the other seven: a check that could only pass.
 
 ## NEXT ACTION
-Phase A is running. When `A1_integrity.md` ends with `## STATUS: COMPLETE`, read it, record a gate
-verdict above, then launch B1+B2+B3 in parallel.
+Phase B running (B1, B2, B3 in parallel). When all three end with `## STATUS: COMPLETE`, read them,
+check their claims against `error_bars.json`, record a gate verdict, then launch C (skeptic, Fable)
+using `briefs/C1_skeptic.md`.
