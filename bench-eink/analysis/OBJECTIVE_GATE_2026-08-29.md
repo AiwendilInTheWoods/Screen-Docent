@@ -127,4 +127,51 @@ the best curve *by a measure that disagrees with the judge*.
 3. `tools/eink_objective_gate.py` now runs this check on any candidate in one command. Nothing should
    be fitted against an objective that has not passed it.
 
+## 7. Follow-up: the trade is two-ended, and a second feature moves the ceiling — but not the boundary
+
+**Registered before testing:** white-point is one knob trading highlight recovery against shadow crush
+(ADR-094), so the optimum must depend on BOTH ends and a one-ended feature cannot express it.
+Predicted: among 0.64-vs-0.76 pickers, the 0.76 group carries >=1.5x the content below the shadow
+floor (ink luminance 71.3), and a two-feature rule clears the 34.8% base rate leave-one-out.
+
+**Direction supported.** Each feature isolates ONE class and is blind to the other two:
+
+    picked   above ceiling (>163)   below floor (<71.3)
+    0.64          44.1%                 15.7%
+    0.76          37.2%                 28.9%      <- 1.85x the 0.64 group (predicted >=1.5x)
+    0.88           8.6%                 26.0%
+
+A two-threshold cascade (`above < t1 -> 0.88`; else `below < t2 -> 0.64`; else `0.76`) reaches
+**60.9% leave-one-out, permutation p = 0.010** — the first thing all day to clear the base rate.
+
+⚠️ **AND THE CONFUSION MATRIX SAYS IT DID NOT SOLVE THE STATED PROBLEM.**
+
+    human 0.64 -> 2/7 correct      <- the boundary this was supposed to explain
+    human 0.76 -> 6/8
+    human 0.88 -> 7/8
+
+The fitted second threshold is `below_floor < 1%`, satisfied by **3 works of 23**, so the 0.64 branch
+is nearly empty: the rule is in practice *"0.88 when there is nothing above the ceiling, otherwise
+0.76"*. Its 60.9% is one genuine discrimination (0.88 vs the rest, which the ceiling feature already
+did) plus defaulting to the mode of the remainder. **Group means separating is not the same as a
+decision boundary existing** — 1.85x on the means yielded no usable cut.
+
+📏 Quoted alone, 60.9% at p = 0.010 would have read as "per-work is back". The distribution is what
+says otherwise — the same lesson as §1, one section later, on my own result.
+
+⚠️ **This does NOT reopen ADR-093.** What is now defensible is a BINARY question — *does this work
+have anything above the ceiling to rescue?* — at 7/8, not the three-level per-work rule ADR-093
+withdrew. ADR-092's binary was 0.64-vs-0.88 and ADR-093's criticism was that it learned "which works
+tolerate a bad option least"; this is a different question on different data and must be argued
+explicitly against ADR-093 before anything is shipped, not slipped back in.
+
+**Conclusion for per-work.** Two features and six terms now fail to split 0.64 from 0.76. That is not
+a feature-hunting problem any more — it needs an objective that can rank renders, and §3 shows the
+current terms cannot at any weighting. **The missing mechanism is perceptual fusion:** every term
+counts pixels one at a time, and none models that dither fuses at viewing distance, which is the whole
+reason dithering works and is exactly what the judge sees from a wall. A spatial/perceptual difference
+metric (S-CIELAB style — filter render and reference by human contrast sensitivity at the real viewing
+distance, then compare in a perceptual space) is the standard answer to that question rather than
+another invented one, and it can be gated against these same 23 labels with no panel time.
+
 ## STATUS: COMPLETE
