@@ -38,12 +38,20 @@ a constraint cannot. This alone should stop the grey-rectangle solutions.
 paintings; 11 from 2026-08-28). Each says which of wp 0.64 / 0.76 / 0.88 Josh preferred on a known
 work. **Any objective worth using must rank those the way he did.**
 
-Procedure: for each labelled work, score the three white-point renders with the candidate cost
-function and check whether the argmin matches the human pick. Report accuracy against the 61% base
-rate of always picking the modal answer. If it cannot reproduce the 23 calls, it has no business
-choosing a curve for 2,857 paintings. This costs no panel time.
+✅ **DONE 2026-08-29 evening — the incumbent objective FAILED it. See ADR-097 and
+`OBJECTIVE_GATE_2026-08-29.md`.** The gate is now runnable: `python tools/eink_objective_gate.py
+--ceiling`. Run it on any candidate before fitting anything with it.
 
-⚠️ Do this BEFORE fitting any curve. An objective that fails here invalidates everything fitted with it.
+⚠️ **THE BASE RATE STATED HERE WAS WRONG: it is 34.8%, not 61%.** The 23 picks split 0.64 x7 /
+0.76 x8 / 0.88 x8, so always-guess-the-mode scores 8/23. A 61% bar would have failed a working
+objective — a check that can only return the wrong verdict, the same signature as the eleven
+instrument defects.
+
+Result: `eink_scurve.cost` scores 7/23 = 30.4%, and **predicts 0.64 on 23 of 23 works** — it is a
+constant, and its hits are coincidences. The best possible re-weighting of its six terms reaches only
+34.8-43.5% leave-one-out. **Do not fit a curve against it, constrained family or not** (step 1 remains
+worth doing but is now known to be insufficient — a slope bound stops the grey rectangle without
+giving the objective the ability to tell a good render from a bad one).
 
 ### 3. Only then fit the curve, and check it against the incumbents
 Baselines already measured (6 works, fidelity-weighted cost): production `_adaptive_gamma` 190.80 ·
